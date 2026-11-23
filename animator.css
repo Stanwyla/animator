@@ -1,0 +1,349 @@
+/* All styling for the Animator app. Its code only attaches class names. */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; overflow: hidden; }
+
+/* ── Layout: two columns ─────────────────────────────────────────────────── */
+
+.app {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  background: #1a1a2e;
+  color: #d4c5a0;
+  font-family: system-ui, sans-serif;
+  font-size: 14px;
+}
+
+/* Left column: the code editor. */
+.code-col {
+  width: 42%;
+  min-width: 320px;
+  max-width: 720px;
+  flex-shrink: 0;
+  display: flex;
+  border-right: 1px solid #3a3a5e;
+  background: #0f0f1e;
+}
+
+/* The code column stays in the DOM when collapsed, so CodeMirror keeps its
+   state; hiding it gives the right column the full width. */
+.app.code-hidden .code-col { display: none; }
+
+/* A small emoji button (the code pane's collapse toggle, and the playback
+   controls once they exist). */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #2a2a4a;
+  color: #d4c5a0;
+  border: 1px solid #4a4a8a;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 5px 8px;
+}
+.icon-btn:hover { background: #3a3a5e; }
+.icon-btn:disabled { opacity: 0.4; cursor: default; }
+.icon-btn[aria-pressed="true"] { border-color: #89ddff; color: #89ddff; }
+
+/* ── Code panel (left column) ───────────────────────────────────────────── */
+
+.code-panel {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: #1a1a3e;
+  border-bottom: 1px solid #3a3a5e;
+}
+.code-title {
+  color: #e8d8b0;
+  font-family: 'Georgia', serif;
+  font-size: 16px;
+  letter-spacing: 1px;
+}
+
+/* Wrapper holding the editor. */
+.code-editor-wrap {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  display: flex;
+}
+/* CodeMirror mount node: grows to fill the panel. */
+.code-editor {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  overflow: hidden;
+  background: #0d0d1a;
+}
+.code-editor .cm-editor { width: 100%; height: 100%; }
+
+/* Collapsible reference of the built-ins available to draw functions. */
+.reference {
+  margin: 8px 14px 0;
+  border: 1px solid #3a3a5e;
+  border-radius: 4px;
+  background: #0d0d1a;
+  overflow: hidden;
+}
+.reference-summary {
+  padding: 6px 12px;
+  cursor: pointer;
+  color: #b8a888;
+  font-family: monospace;
+  font-size: 12px;
+  user-select: none;
+}
+.reference-summary:hover { color: #e8d8b0; }
+.reference-body {
+  padding: 4px 12px 10px;
+  border-top: 1px solid #3a3a5e;
+}
+.reference-group { margin-top: 8px; }
+.reference-group-title {
+  color: #8a8aca;
+  font-family: monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+.reference-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  padding: 1px 0;
+}
+.reference-sig {
+  color: #89ddff;
+  font-family: monospace;
+  font-size: 12px;
+  white-space: pre;
+}
+.reference-desc { color: #6a7a8a; font-size: 11px; }
+
+/* ── Animation area (right column) ──────────────────────────────────────── */
+
+/* The right column: the error message above the canvas. */
+.anim-col {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: #0a0a14;
+}
+
+.canvas-area {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0a0a14;
+  container-type: size;
+}
+
+/* Why the code can't be drawn. Its height is fixed, so an error that comes and
+   goes while typing doesn't resize the canvas; a long message scrolls. */
+.top-bar { flex: none; display: flex; align-items: center; }
+.error-bar {
+  flex: 1;
+  min-width: 0;
+  box-sizing: border-box;
+  height: 56px;
+  padding: 8px 16px;
+  overflow: auto;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #ff5c5c;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+/* Leave room for the reveal button, which only overlays this pane while the
+   code column is hidden. */
+.app.code-hidden .error-bar { padding-left: 56px; }
+
+/* The music player, to the right of the error message. */
+.music {
+  flex: none;
+  padding-right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.music-hint { font-size: 13px; color: #8a8aca; }
+/* One size for both symbols, so that the button doesn't move. */
+.music-play { width: 30px; height: 26px; padding: 0; font-size: 11px; white-space: nowrap; }
+/* The file input is there for the keyboard, but the label is what shows. */
+.music-choose { position: relative; white-space: nowrap; }
+.music-choose input { position: absolute; inset: 0; opacity: 0; width: 100%; cursor: pointer; }
+.music-choose input::file-selector-button { cursor: pointer; }
+.music-choose:focus-within { outline: 2px solid #89ddff; }
+
+/* The new-drawing button, drawing menu, sliders, and replay button below the canvas. */
+.controls {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 10px;
+  padding: 10px 12px;
+  border-top: 1px solid #3a3a5e;
+  background: #0f0f1e;
+}
+.drawing-picker { display: flex; align-items: center; gap: 8px; }
+.drawing-select {
+  max-width: 148px;
+  padding: 5px 8px;
+  border: 1px solid #4a4a8a;
+  border-radius: 4px;
+  background: #2a2a4a;
+  color: #d4c5a0;
+  font: inherit;
+}
+.slider { display: flex; align-items: center; gap: 8px; }
+.slider input { width: 76px; accent-color: #89ddff; }
+/* Wide enough for "-2.0x", so the sliders don't shift as the number changes. */
+.slider-value {
+  min-width: 5ch;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 13px;
+}
+
+/* Button that reveals the code column again when it is hidden. */
+.reveal-code {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 10;
+}
+
+/* A centred square that fits the (possibly non-square) animation area. Give your
+   <canvas> this class, so that drawings aren't stretched. */
+.canvas {
+  display: block;
+  width: min(100cqw, 100cqh);
+  height: min(100cqw, 100cqh);
+}
+
+/* ── The picture frame ──────────────────────────────────────────────────── */
+
+/* A plain wall, light enough to show the edge of a black frame. */
+.framed { background: #1e1d24; }
+
+/* The frame fits the drawing. Its variables come from frame.gleam: the drawing's
+   place (--x, --y) and size (--w, --h) and the frame's thickness (--t), each as part
+   of the canvas's side (--side). The canvas only gets smaller, to make room.
+
+   Each style below sets how thick it is compared with the others (--scale), and how
+   that is divided from the outside in: --edge, --band, and --lip, which add up to 1. */
+.framed .frame {
+  --total: calc(var(--t) * var(--scale));
+  --side: min(
+    100cqw,
+    100cqh,
+    96cqw / (var(--w) + 2 * var(--total)),
+    96cqh / (var(--h) + 2 * var(--total))
+  );
+  --thick: calc(var(--side) * var(--total));
+  --drop: 0 calc(var(--thick) * 0.35) calc(var(--thick) * 0.9) rgba(0, 0, 0, 0.65);
+  flex: none;
+  border: calc(var(--thick) * var(--edge)) solid;
+  padding: calc(var(--thick) * var(--band));
+}
+.framed .picture {
+  box-sizing: content-box;
+  position: relative;
+  overflow: hidden;
+  width: calc(var(--side) * var(--w));
+  height: calc(var(--side) * var(--h));
+  border: calc(var(--thick) * var(--lip)) solid;
+  background: #0a0a14;
+}
+/* The shadow that the frame casts on the picture. */
+.framed .picture::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 calc(var(--thick) * 0.08) calc(var(--thick) * 0.25) rgba(0, 0, 0, 0.7);
+}
+.framed .canvas {
+  position: absolute;
+  left: calc(var(--side) * -1 * var(--x));
+  top: calc(var(--side) * -1 * var(--y));
+  width: var(--side);
+  height: var(--side);
+}
+
+/* Gold: a gilded frame with a deep hollow. */
+.frame-gold .frame {
+  --scale: 1;
+  --edge: 0.55;
+  --band: 0.3;
+  --lip: 0.15;
+  border-color: #e6c877 #93692a #6f4c1a #c59a45;
+  background: linear-gradient(135deg, #4a3110, #a67b31 50%, #523712);
+  box-shadow: 0 0 0 1px #3b270c, inset 0 0 calc(var(--thick) * 0.12) #2a1a06, var(--drop);
+}
+.frame-gold .picture { border-color: #7d5a20 #e9cd82 #f3dc9a #a37a34; }
+
+/* Walnut: grained dark wood, whose corners are cut at an angle, with a thin gold line
+   around the picture. */
+.frame-walnut .frame {
+  --scale: 0.9;
+  --edge: 0.82;
+  --band: 0.1;
+  --lip: 0.08;
+  border-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cpath fill='%23704828' d='M0 0h300v300H0z'/%3E%3Cg fill='none'%3E%3Cpath stroke='%238a5c36' stroke-width='9' d='M5 5h290v290H5z'/%3E%3Cpath stroke='%234a2c17' stroke-width='3' d='M14 14h272v272H14z'/%3E%3Cpath stroke='%23825431' stroke-width='7' d='M24 24h252v252H24z'/%3E%3Cpath stroke='%23553419' stroke-width='5' d='M34 34h232v232H34z'/%3E%3Cpath stroke='%237c5030' stroke-width='6' d='M45 45h210v210H45z'/%3E%3Cpath stroke='%2343270f' stroke-width='2' d='M53 53h194v194H53z'/%3E%3Cpath stroke='%23643e20' stroke-width='11' d='M62 62h176v176H62z'/%3E%3Cpath stroke='%23482a14' stroke-width='4' d='M74 74h152v152H74z'/%3E%3Cpath stroke='%23754a2a' stroke-width='6' d='M83 83h134v134H83z'/%3E%3Cpath stroke='%233a2110' stroke-width='10' d='M95 95h110v110H95z'/%3E%3C/g%3E%3Cpath fill='%23fff' fill-opacity='.1' d='M0 0h300L200 100H100z'/%3E%3Cpath fill='%23000' fill-opacity='.3' d='M0 300h300L200 200H100z'/%3E%3Cpath fill='%23000' fill-opacity='.16' d='M300 0v300L200 200V100z'/%3E%3Cpath stroke='%23201008' stroke-opacity='.7' d='M0 0l100 100M300 0L200 100M0 300l100-100M300 300L200 200'/%3E%3C/svg%3E") 100 stretch;
+  background: #24140a;
+  box-shadow: 0 0 0 1px #1c0f07, var(--drop);
+}
+.frame-walnut .picture { border-color: #8f6a2c #d9b566 #e8cb84 #a98038; }
+
+/* Gallery: a thin black frame, with a white mat between it and the picture. */
+.frame-gallery .frame {
+  --scale: 1.5;
+  --edge: 0.2;
+  --band: 0.76;
+  --lip: 0.04;
+  border-color: #3a3a3e #1b1b1e #0d0d0f #27272a;
+  background: #f1ede3;
+  box-shadow: inset 0 calc(var(--thick) * 0.05) calc(var(--thick) * 0.14) rgba(0, 0, 0, 0.45), var(--drop);
+}
+.frame-gallery .picture { border-color: #b9b2a2 #fffdf7 #fffdf7 #cfc8b8; }
+
+/* Silver: silver leaf, with a row of beads around the picture. */
+.frame-silver .frame {
+  --scale: 1.05;
+  --edge: 0.6;
+  --band: 0.26;
+  --lip: 0.14;
+  --bead: calc(var(--thick) * var(--band));
+  border-color: #eceff3 #8b939e #666d78 #c3c9d1;
+  background:
+    radial-gradient(circle at 40% 35%, #fff 0 8%, #c9d0d8 30%, #7b838e 48%, transparent 52%)
+      0 0 / var(--bead) var(--bead) round,
+    #3a3f47;
+  box-shadow: 0 0 0 1px #3c424b, var(--drop);
+}
+.frame-silver .picture { border-color: #7c848f #dfe4ea #f3f6f9 #a4acb6; }
+
